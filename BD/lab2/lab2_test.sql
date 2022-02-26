@@ -59,7 +59,7 @@ group by p.ProductID
 having COUNT(*) > 3 
 
 /* ¹10 */
-select p.ProductCategoryID
+select top 1 with ties p.ProductCategoryID
 from Production.ProductSubcategory as p
 group by p.ProductCategoryID
 order by COUNT(*) desc 
