@@ -207,3 +207,16 @@ where soh.SalesOrderID not in (
 )
 group by soh.CustomerID
 having count(*) = count(distinct sod.ProductID)
+
+/* Task 19 */
+select soh.CustomerID
+from Sales.SalesOrderHeader as soh
+group by soh.CustomerID
+having count(*) > 1 and count(distinct soh.SalesOrderID) = all (
+		select count(*)
+		from Sales.SalesOrderDetail as _sod
+		join Sales.SalesOrderHeader as _soh
+		on _sod.SalesOrderID = _soh.SalesOrderID
+		where _soh.CustomerID = soh.CustomerID
+		group by _soh.CustomerID, _sod.ProductID
+	)
