@@ -119,8 +119,12 @@ where (
 ) 
 
 /* Task 12 */
-select p.Name
+select pc.Name
 from Production.Product as p
+join Production.ProductSubcategory as ps
+on ps.ProductSubcategoryID = p.ProductSubcategoryID
+join Production.ProductCategory as pc
+on pc.ProductCategoryID = ps.ProductCategoryID
 where p.ProductID in (
 	select top 1 sod.ProductID
 	from Sales.SalesOrderDetail as sod
@@ -220,3 +224,23 @@ having count(*) > 1 and count(distinct soh.SalesOrderID) = all (
 		where _soh.CustomerID = soh.CustomerID
 		group by _soh.CustomerID, _sod.ProductID
 	)
+
+/* Task 20 */
+select p.ProductID, p.Name, (
+	select count(distinct soh1.CustomerID) 
+	from Sales.SalesOrderDetail as sod1
+	join Sales.SalesOrderHeader as soh1
+	on sod1.SalesOrderID = soh1.SalesOrderID
+	where p.ProductID = sod1.ProductID
+) as 'Bought', (
+	select count(*) - (
+		select count(distinct soh1.CustomerID) 
+		from Sales.SalesOrderDetail as sod1
+		join Sales.SalesOrderHeader as soh1
+		on sod1.SalesOrderID = soh1.SalesOrderID
+		where p.ProductID = sod1.ProductID
+	) 
+	from Sales.SalesOrderHeader as soh2
+) as 'Didn`t buy'
+from Production.Product as p
+group by p.ProductID, p.Name
