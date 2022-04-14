@@ -67,27 +67,27 @@ where sod.UnitPrice = (
 	join Sales.SalesOrderHeader as _soh 
 	on _sod.SalesOrderID = _soh.SalesOrderID
 	where _soh.CustomerID = soh.CustomerID
-) 
+)
 
 /* Task 8 */
-select p.ProductSubcategoryID, max(p.Name)
+select p.ProductSubcategoryID, p.Name
 from Production.Product as p
 where p.Color = 'Red' and p.ListPrice = (
 	select max(_p.ListPrice)
 	from Production.Product as _p
-	where _p.ProductSubcategoryID = p.ProductSubcategoryID
+	where _p.ProductSubcategoryID = p.ProductSubcategoryID and p.Color = 'Red'
 )
-group by p.ProductSubcategoryID 
+order by p.ProductSubcategoryID
 
 /* Task 9 */
-select p.ProductSubcategoryID, max(p.Name)
+select p.ProductSubcategoryID, p.Name
 from Production.Product as p
 where p.ListPrice = (
 	select max(_p.ListPrice)
 	from Production.Product as _p
 	where _p.ProductSubcategoryID = p.ProductSubcategoryID
 )
-group by p.ProductSubcategoryID 
+order by p.ProductSubcategoryID
 
 /* Task 10 */
 select soh.SalesOrderID
@@ -126,7 +126,7 @@ on ps.ProductSubcategoryID = p.ProductSubcategoryID
 join Production.ProductCategory as pc
 on pc.ProductCategoryID = ps.ProductCategoryID
 where p.ProductID in (
-	select top 1 sod.ProductID
+	select top 1 with ties sod.ProductID
 	from Sales.SalesOrderDetail as sod
 	group by sod.ProductID
 	order by count(*) desc
@@ -216,14 +216,14 @@ having count(*) = count(distinct sod.ProductID)
 select soh.CustomerID
 from Sales.SalesOrderHeader as soh
 group by soh.CustomerID
-having count(*) > 1 and count(distinct soh.SalesOrderID) = all (
+having count(distinct soh.SalesOrderID) > 1 and count(distinct soh.SalesOrderID) = any (
 		select count(*)
 		from Sales.SalesOrderDetail as _sod
 		join Sales.SalesOrderHeader as _soh
 		on _sod.SalesOrderID = _soh.SalesOrderID
 		where _soh.CustomerID = soh.CustomerID
 		group by _soh.CustomerID, _sod.ProductID
-	)
+)
 
 /* Task 20 */
 select p.ProductID, p.Name, (
