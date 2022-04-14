@@ -57,7 +57,7 @@ where p.Color in (
 ) 
 
 /* Task 7 */
-select distinct soh.CustomerID, sod.UnitPrice
+select distinct soh.CustomerID, sod.ProductID
 from Sales.SalesOrderDetail as sod
 join Sales.SalesOrderHeader as soh
 on sod.SalesOrderID = soh.SalesOrderID
@@ -159,7 +159,7 @@ where ps.ProductSubcategoryID = (
 ) 
 
 /* Task 15 */
-select distinct pc.Name
+select pc.Name
 from Production.ProductCategory as pc
 where pc.ProductCategoryID in (
 	select ps.ProductCategoryID
@@ -168,7 +168,7 @@ where pc.ProductCategoryID in (
 	on p.ProductSubcategoryID = ps.ProductSubCategoryID
 	where p.Color = 'Red'
 	group by ps.ProductCategoryID
-	having count(*) > 3
+	having count(*) >= 3
 ) 
 
 /* Task 16 */
