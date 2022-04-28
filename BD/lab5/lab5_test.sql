@@ -179,7 +179,7 @@ order by t1.customer_id
 Найти для каждого товара соотношение количества покупателей, купивших этот
 товар, к общему количеству покупателей, совершавших когда-либо покупки */
 select t1.product_id as product_id, 
-	   t1.product_id * 1.0 / t2.customers_amount as customer_ratio
+	   t1.customers_amount * 1.0 / t2.customers_amount as customer_ratio
 from (
 	select p.ProductID as product_id,
 		   count(distinct soh.CustomerID) as customers_amount
