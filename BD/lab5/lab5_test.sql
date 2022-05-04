@@ -110,17 +110,17 @@ on t1.product_category_id = t2.product_category_id
 Вывести на экран номера покупателей, количество 
 купленных ими товаров, и количество чеков, которые у них были */
 select t1.customer_id as customer_id,
-	   t1.sales_amount as sales_amount,
-	   t1.products_amount as products_amount 
+	   count(distinct t1.sales_amount) as sales_amount,
+	   sum(t1.products_amount) as products_amount 
 from (
 	select soh.CustomerID as customer_id,
-		   count(distinct sod.SalesOrderID) as sales_amount,
-		   sum(sod.OrderQty) as products_amount
+		   sod.SalesOrderID as sales_amount,
+		   sod.OrderQty as products_amount
 	from Sales.SalesOrderDetail as sod
 	join Sales.SalesOrderHeader as soh
 	on sod.SalesOrderID = soh.SalesOrderID
-	group by soh.CustomerID
 ) as t1
+group by t1.customer_id
 order by t1.customer_id
 
 /* Task 5 
@@ -179,7 +179,7 @@ order by t1.customer_id
 Найти для каждого товара соотношение количества покупателей, купивших этот
 товар, к общему количеству покупателей, совершавших когда-либо покупки */
 select t1.product_id as product_id, 
-	   t1.customers_amount * 1.0 / t2.customers_amount as customer_ratio
+	   t1.product_id * 1.0 / t2.customers_amount as customer_ratio
 from (
 	select p.ProductID as product_id,
 		   count(distinct soh.CustomerID) as customers_amount
