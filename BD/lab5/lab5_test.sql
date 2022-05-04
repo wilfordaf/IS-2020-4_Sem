@@ -110,12 +110,12 @@ on t1.product_category_id = t2.product_category_id
 Вывести на экран номера покупателей, количество 
 купленных ими товаров, и количество чеков, которые у них были */
 select t1.customer_id as customer_id,
-	   count(distinct t1.sales_amount) as sales_amount,
-	   sum(t1.products_amount) as products_amount 
+	   count(distinct t1.sale_id) as sales_amount,
+	   sum(t1.sale_qty) as products_amount 
 from (
 	select soh.CustomerID as customer_id,
-		   sod.SalesOrderID as sales_amount,
-		   sod.OrderQty as products_amount
+		   sod.SalesOrderID as sale_id,
+		   sod.OrderQty as sale_qty
 	from Sales.SalesOrderDetail as sod
 	join Sales.SalesOrderHeader as soh
 	on sod.SalesOrderID = soh.SalesOrderID
