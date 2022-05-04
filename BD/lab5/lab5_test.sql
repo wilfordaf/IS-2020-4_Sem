@@ -374,24 +374,29 @@ on t1.product_subcategory_id = t2.product_subcategory_id
 /* Task 14 
 Найти для каждого покупателя количество чеков, 
 где присутствуют товары минимум из двух подкатегорий товаров */
-select _soh.CustomerID as customer_id,
-	   count(distinct _sod.SalesOrderID) as sales_amount
-from Sales.SalesOrderDetail as _sod
-join Sales.SalesOrderHeader as _soh
-on _sod.SalesOrderID = _soh.SalesOrderID
-where _sod.SalesOrderID in (
-	select t1.sale_id
-	from (
-		select sod.SalesOrderID as sale_id,
-			   p.ProductSubcategoryID as product_subcategory_id
+with t1(customer_id, zero) as (
+	select distinct soh.CustomerID, 0
+	from Sales.SalesOrderHeader as soh
+), t2(customer_id, sales_amount) as (
+	select soh.CustomerID as customer_id,
+		   count(soh.SalesOrderID) as sales_amount
+	from Sales.SalesOrderHeader as soh
+	where soh.SalesOrderID in (
+		select sod.SalesOrderID as sale_id
 		from Sales.SalesOrderDetail as sod
-		join Production.Product as p 
+		join Production.Product as p
 		on p.ProductID = sod.ProductID
-	) as t1 
-	group by t1.sale_id
-	having count(distinct t1.product_subcategory_id) > 1
+		group by sod.SalesOrderID
+		having count(distinct p.ProductSubcategoryID) > 1
+	)
+	group by soh.CustomerID
 )
-group by _soh.CustomerID 
+select t1.customer_id as customer_id,
+	   coalesce(t2.sales_amount, t1.zero) as sales_amount
+from t1
+full join t2
+on t1.customer_id = t2.customer_id
+order by t1.customer_id
 
 /* Task 15 
 Вывести на экран следующую информацию: номер пользователя, 
