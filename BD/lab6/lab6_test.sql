@@ -81,18 +81,6 @@ join Production.ProductSubcategory as ps
 on ps.ProductSubcategoryID = p.ProductSubcategoryID
 
 /* Task 6
-Вывести на экран следующую информацию: название товара, название 
-категории к которой он относится и общее количество товаров в этой категории */
-select p.Name as product_name,
-	   pc.Name as product_category_name,
-	   count(p.ProductID) over (partition by ps.ProductCategoryId) as products_in_category_amount
-from Production.Product as p
-join Production.ProductSubcategory as ps
-on ps.ProductSubcategoryID = p.ProductSubcategoryID
-join Production.ProductCategory as pc
-on ps.ProductCategoryID = pc.ProductCategoryID
-
-/* Task 7
 Найти для каждого покупателя все чеки, и для каждого чека вывести 
 информацию: номер покупателя, номер чека, и сумма всех 
 затрат этого покупателя с момента первой покупки и до данного чека */
