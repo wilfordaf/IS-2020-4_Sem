@@ -82,22 +82,20 @@ on ps.ProductSubcategoryID = p.ProductSubcategoryID
 
 /* Task 6
 Найти для каждого покупателя все чеки, и для каждого чека вывести 
-информацию: номер покупателя, номер чека, и сумма всех 
+информацию: номер покупателя, номер чека, и сумма всех
 затрат этого покупателя с момента первой покупки и до данного чека */
-/* Если до данного чека, НЕ включая его, что не очень логично, то 
-вместо current row нужно вписать 1 following */
-with t1(customer_id, sale_id, sum_rank) as (
-	select soh.CustomerID as customer_id,
-	   sod.SalesOrderID as sale_id,
-	   sum(sod.LineTotal) over (partition by soh.CustomerId order by sod.ModifiedDate desc 
-								rows between current row and unbounded following) as sum_previous_purchases
-	   
-	from Sales.SalesOrderDetail as sod
-	join Sales.SalesOrderHeader as soh
-	on sod.SalesOrderID = soh.SalesOrderID
-)
-select distinct t1.customer_id as customer_id,
-	   t1.sale_id as sale_id,
-	   max(t1.sum_rank) over (partition by t1.customer_id, t1.sale_id) as sum_previous
-from t1
-order by t1.customer_id
+
+select soh.CustomerID as customer_id,
+	   soh.SalesOrderID as sale_id,
+	   sum(soh.SubTotal) over (partition by soh.CustomerID order by soh.OrderDate desc
+	   rows between current row and unbounded following) as sales_sum
+from Sales.SalesOrderHeader as soh 
+order by soh.CustomerID
+
+/* Если до данного чека, НЕ включая его, что не очень логично, то */
+select soh.CustomerID as customer_id,
+	   soh.SalesOrderID as sale_id,
+	   coalesce(sum(soh.SubTotal) over (partition by soh.CustomerID order by soh.OrderDate desc
+	   rows between 1 following and unbounded following), 0) as sales_sum
+from Sales.SalesOrderHeader as soh 
+order by soh.CustomerID
